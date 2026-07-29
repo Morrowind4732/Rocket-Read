@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#071c31">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Rocket Read</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hud top-hud">
+      <div class="shot-block">
+        <span class="hud-label">SHOT</span>
+        <strong id="shotCounter" class="shot-count">1</strong>
+      </div>
+      <div class="title-block">
+        <strong>ROCKET READ</strong>
+        <span id="phaseText">Watch the approach</span>
+      </div>
+      <div class="hud-actions">
+        <div class="mode-mini"><span class="hud-label">MODE</span><b id="modeReadout">MIXED</b></div>
+        <button id="settingsButton" class="icon-button" type="button" aria-label="Open shot settings">⚙</button>
+      </div>
+    </header>
+
+    <section id="stageWrap" class="stage-wrap" aria-label="Three-dimensional bounce view">
+      <canvas id="scene"></canvas>
+      <div id="phaseBadge" class="phase-badge">INCOMING PATH — WATCH THE LOOP</div>
+      <div id="speedGauge" class="speed-gauge" aria-label="Ball speed">
+        <div class="gauge-arc"><span id="gaugeNeedle"></span></div>
+        <b id="speedText">0</b><small>uu/s</small>
+      </div>
+      <div class="stage-buttons" aria-label="Arena controls">
+        <button id="playButton" class="stage-button primary-stage" type="button">Pause</button>
+        <button id="driveButton" class="stage-button" type="button">Drive</button>
+        <button id="optimumButton" class="stage-button" type="button" aria-pressed="false">Optimum</button>
+        <button id="viewModeButton" class="stage-button" type="button">Car</button>
+        <button id="cameraModeButton" class="stage-button" type="button" hidden>Camera</button>
+      </div>
+      <div id="stageHelp" class="stage-help">Arena view: one finger orbits · two fingers zoom</div>
+      <div id="pathHint" class="path-hint neutral">PATH CHECK — set your ball and car guess</div>
+      <div id="driveOverlay" class="drive-overlay" hidden aria-label="Drive controls">
+        <div id="driveReady" class="drive-ready">Touch any control to start the ball</div>
+        <div id="joyZone" class="joy-zone">
+          <div id="joyBase" class="joy-base">
+            <div id="joyKnob" class="joy-knob"></div>
+          </div>
+        </div>
+        <button id="driveCameraButton" class="drive-camera-toggle" type="button" aria-pressed="true">Ball Cam</button>
+        <div class="drive-buttons" aria-label="Drive actions">
+          <button id="accelerateButton" class="drive-action accel" type="button">Accel</button>
+          <button id="boostButton" class="drive-action boost" type="button">Boost</button>
+          <button id="powerslideButton" class="drive-action powerslide" type="button">Powerslide</button>
+          <button id="jumpButton" class="drive-action jump" type="button">Jump</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="trainer-panel" aria-label="Guess controls">
+      <div class="tab-row" role="tablist" aria-label="Guess type">
+        <button id="ballTabButton" class="tab-button active" type="button" role="tab" aria-selected="true" aria-controls="ballPanel">
+          <span>1</span> Ball angles <b id="ballTabScore">—</b>
+        </button>
+        <button id="carTabButton" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="carPanel">
+          <span>2</span> Car launch <b id="carTabScore">—</b>
+        </button>
+      </div>
+
+      <div class="tab-content">
+        <section id="ballPanel" class="tab-panel active" role="tabpanel" aria-labelledby="ballTabButton">
+          <div class="panel-headline">
+            <span>Predict the ball after the marked bounce</span>
+            <small>Drag both white markers</small>
+          </div>
+          <div class="dual-angle-grid">
+            <article class="angle-control">
+              <div class="angle-label"><b>Horizontal</b><div class="angle-stepper"><button id="ballHeadingMinus" type="button" aria-label="Decrease ball horizontal angle">−</button><output id="ballHeadingOutput">0°</output><button id="ballHeadingPlus" type="button" aria-label="Increase ball horizontal angle">+</button></div></div>
+              <canvas id="topPad" aria-label="Ball horizontal bounce direction"></canvas>
+            </article>
+            <article class="angle-control">
+              <div class="angle-label"><b>Vertical</b><div class="angle-stepper"><button id="ballElevationMinus" type="button" aria-label="Decrease ball vertical angle">−</button><output id="ballElevationOutput">0°</output><button id="ballElevationPlus" type="button" aria-label="Increase ball vertical angle">+</button></div></div>
+              <canvas id="sidePad" aria-label="Ball vertical bounce angle"></canvas>
+            </article>
+          </div>
+        </section>
+
+        <section id="carPanel" class="tab-panel" role="tabpanel" aria-labelledby="carTabButton" hidden>
+          <div class="panel-headline">
+            <span id="targetGoalBadge" class="goal-badge">TARGET: ORANGE GOAL</span>
+            <small>Set aerial direction and launch speed</small>
+          </div>
+          <div class="dual-angle-grid car-angles">
+            <article class="angle-control">
+              <div class="angle-label"><b>Horizontal</b><div class="angle-stepper"><button id="carHeadingMinus" type="button" aria-label="Decrease car horizontal angle">−</button><output id="carHeadingOutput">0°</output><button id="carHeadingPlus" type="button" aria-label="Increase car horizontal angle">+</button></div></div>
+              <canvas id="carPad" aria-label="Car horizontal launch direction"></canvas>
+            </article>
+            <article class="angle-control">
+              <div class="angle-label"><b>Vertical</b><div class="angle-stepper"><button id="carElevationMinus" type="button" aria-label="Decrease car vertical angle">−</button><output id="carElevationOutput">0°</output><button id="carElevationPlus" type="button" aria-label="Increase car vertical angle">+</button></div></div>
+              <canvas id="carSidePad" aria-label="Car vertical launch angle"></canvas>
+            </article>
+          </div>
+          <div class="car-timing-grid">
+            <div class="compact-slider-row slider-adjust-row">
+              <label for="carSpeedRange">Launch speed</label>
+              <button id="carSpeedMinus" class="mini-step-button" type="button" aria-label="Decrease launch speed">−</button>
+              <div class="range-wrap">
+                <input id="carSpeedRange" type="range" min="0" max="2300" step="10" value="1500">
+                <span id="carSpeedTarget" class="range-target" hidden aria-hidden="true"></span>
+              </div>
+              <button id="carSpeedPlus" class="mini-step-button" type="button" aria-label="Increase launch speed">+</button>
+              <output id="carSpeedOutput">1500 uu/s</output>
+            </div>
+            <div class="compact-slider-row delay-row slider-adjust-row">
+              <label for="carDelayRange">Launch delay</label>
+              <button id="carDelayMinus" class="mini-step-button" type="button" aria-label="Decrease launch delay" disabled>−</button>
+              <div class="range-wrap">
+                <input id="carDelayRange" type="range" min="0" max="3" step="0.02" value="0" disabled>
+                <span id="carDelayTarget" class="range-target" hidden aria-hidden="true"></span>
+              </div>
+              <button id="carDelayPlus" class="mini-step-button" type="button" aria-label="Increase launch delay" disabled>+</button>
+              <output id="carDelayOutput">0.00 s</output>
+              <span id="carTimingStatus" class="timing-status">Available after Lock read</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section id="resultBar" class="result-bar" aria-live="polite">
+        <div class="result-summary">
+          <span id="resultLabel">Watch the loop, set both tabs, then lock your read.</span>
+          <b><span id="scoreText">—</span> / <span id="carScoreText">—</span></b>
+        </div>
+        <div class="result-details">
+          <span>Ball <b id="angleError">—</b></span>
+          <span>Car H <b id="carHeadingError">—</b></span>
+          <span>Car V <b id="carElevationError">—</b></span>
+          <span>Speed <b id="carSpeedError">—</b></span>
+          <span>Delay <b id="carDelayReadout">—</b></span>
+          <span>Contact <b id="carContactError">—</b></span>
+          <span>Best <b id="optimalSpeed">—</b></span>
+        </div>
+        <span id="horizontalError" hidden>—</span>
+        <span id="verticalError" hidden>—</span>
+        <span id="carResultLabel" hidden></span>
+      </section>
+
+      <nav class="actions" aria-label="Quiz controls">
+        <button id="newButton" class="secondary" type="button">New shot</button>
+        <button id="replayButton" class="secondary" type="button">Restart loop</button>
+        <button id="lockButton" class="primary" type="button">Lock read</button>
+      </nav>
+    </section>
+  </main>
+
+  <dialog id="settingsDialog" class="settings-dialog">
+    <div class="dialog-head">
+      <strong>Shot settings</strong>
+      <button id="closeSettingsButton" class="icon-button" type="button" aria-label="Close settings">✕</button>
+    </div>
+    <div class="settings-grid">
+      <label>Drill
+        <select id="modeSelect">
+          <option value="mixed">Mixed</option>
+          <option value="wall">Side wall</option>
+          <option value="backboard">Backboard</option>
+          <option value="corner">Corner</option>
+          <option value="floor">Floor</option>
+        </select>
+      </label>
+      <label>Spin
+        <select id="spinSelect">
+          <option value="off">Off</option>
+          <option value="light">Light</option>
+          <option value="full">Full</option>
+        </select>
+      </label>
+      <label>Ball speed
+        <select id="speedSelect">
+          <option value="normal">Normal</option>
+          <option value="fast">Fast</option>
+          <option value="any">Any</option>
+        </select>
+      </label>
+      <label>Playback
+        <select id="playbackSelect">
+          <option value="1">1× real speed</option>
+          <option value="0.5">0.5× slow</option>
+          <option value="0.25">0.25× slow</option>
+        </select>
+      </label>
+      <label>Restitution <output id="restOut">0.60</output>
+        <input id="restitution" type="range" min="0.4" max="0.8" value="0.6" step="0.01">
+      </label>
+      <label>Surface grip <output id="gripOut">0.35</output>
+        <input id="grip" type="range" min="0" max="0.8" value="0.35" step="0.01">
+      </label>
+    </div>
+    <p>The car route is an approximate ballistic aerial: horizontal heading, vertical launch angle, initial speed, launch delay, and gravity. After locking your read, adjust the delay to test whether your car and the live ball actually overlap in time and space. It does not yet model boost acceleration or mid-air steering. After locking your read, you can keep adjusting the ball angle, car angle, speed, and delay to test near misses and timing.</p>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
