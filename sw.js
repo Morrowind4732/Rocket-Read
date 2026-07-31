@@ -1,4 +1,4 @@
-const CACHE = 'rocket-read-v42.2-pvp';
+const CACHE = 'rocket-read-v42.3';
 const FILES = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest',
   './VERSION-42.2.txt', './icon.svg'];
 

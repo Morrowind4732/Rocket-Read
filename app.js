@@ -157,7 +157,7 @@
     goalCelebration: { active: false, scoredBy: null, enteredGoal: null, startedAt: 0, endsAt: 0, origin: v3(), particles: [], shockwave: 0 },
     bot: { difficultyIndex: 0, car: null, thinkTimer: 0, steer: 0, throttle: 0, boost: false, powerslide: false, jumpCooldown: 0, stuckTimer: 0, lastTargetDistance: Infinity, recoveryTimer: 0, target: null },
     drive: { active: false, started: false, paused: false, cameraMode: 'ball', steerX: 0, steerY: 0, accel: false, reverse: false, controllerAccel: 0, controllerReverse: 0, boost: false, powerslide: false, airRollLeft: false, airRollRight: false, powerslideAmount: 0, jumpHeld: false, justJump: false, joyPointer: null, hitCooldown: 0, ball: null, car: null, boostTrail: [], boostEmitCarry: 0, lastTime: 0, ballCamOrbit: null, ballCamLastUpdate: 0, ballCamTargetLift: 0, ballCamPullback: 0, ballCamHeightLift: 0, accelBranch: 'accel' },
-    pvp: { active: false, connecting: false, connected: false, channel: null, client: null, clientId: '', joinedAt: 0, role: null, team: null, opponentId: null, countdownStart: 0, countdownEnd: 0, countdownTimer: null, lastStateSend: 0, lastBallSend: 0, lastRemoteAt: 0, kickoffSerial: 0 },
+    pvp: { active: false, connecting: false, connected: false, channel: null, client: null, clientId: '', joinedAt: 0, role: null, team: null, opponentId: null, countdownStart: 0, countdownEnd: 0, countdownTimer: null, lastStateSend: 0, lastBallSend: 0, lastRemoteAt: 0, kickoffSerial: 0, remoteTarget: null, remoteHitCooldown: 0 },
     pointer: new Map(),
     pinchDistance: null,
   };
@@ -3614,7 +3614,7 @@
 
   const SUPABASE_URL = 'https://uvrnxrmwoyhswzldhcul.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_giCNdyuF32ZkCyaob2L4kQ_xIYBJ_L3';
-  const PVP_CHANNEL = 'rocket-read-pvp-main-v1';
+  const PVP_CHANNEL = 'rocket-read-pvp-main-v2';
 
   function setPvpStatus(text, tone = '') {
     const box = $('pvpStatus');
@@ -3634,12 +3634,37 @@
 
   function hydrateRemoteCar(data) {
     if (!data?.p || !data?.v) return;
-    if (!state.bot.car) state.bot.car = { p:v3(), v:v3(), heading:0, pitch:0, roll:0, onGround:true, wheelContacts:4 };
+    const receivedAt = performance.now();
+    state.pvp.remoteTarget = {
+      receivedAt,
+      p:v3(data.p.x, data.p.y, data.p.z),
+      v:v3(data.v.x, data.v.y, data.v.z),
+      data:{...data}
+    };
+    if (!state.bot.car) {
+      state.bot.car = { p:v3(data.p.x, data.p.y, data.p.z), v:v3(data.v.x, data.v.y, data.v.z), heading:0, pitch:0, roll:0, onGround:true, wheelContacts:4 };
+      for (const [key, value] of Object.entries(data)) if (key !== 'p' && key !== 'v' && value !== null) state.bot.car[key] = value;
+    }
+    state.pvp.lastRemoteAt = receivedAt;
+  }
+
+  function updateRemoteCarSmoothing(now) {
+    const target = state.pvp.remoteTarget;
     const car = state.bot.car;
-    car.p = v3(data.p.x, data.p.y, data.p.z);
-    car.v = v3(data.v.x, data.v.y, data.v.z);
-    for (const [key, value] of Object.entries(data)) if (key !== 'p' && key !== 'v' && value !== null) car[key] = value;
-    state.pvp.lastRemoteAt = performance.now();
+    if (!target || !car) return;
+    const age = Math.min(0.12, Math.max(0, (now - target.receivedAt) / 1000));
+    const predicted = add(target.p, mul(target.v, age));
+    const distance = len(sub(predicted, car.p));
+    if (distance > 900) car.p = {...predicted};
+    else car.p = add(car.p, mul(sub(predicted, car.p), 0.24));
+    car.v = add(car.v || v3(), mul(sub(target.v, car.v || v3()), 0.28));
+    const angleLerp = (from, to, amount) => from + angleWrap(to - from) * amount;
+    if (Number.isFinite(target.data.heading)) car.heading = angleLerp(car.heading || 0, target.data.heading, 0.28);
+    if (Number.isFinite(target.data.pitch)) car.pitch = angleLerp(car.pitch || 0, target.data.pitch, 0.28);
+    if (Number.isFinite(target.data.roll)) car.roll = angleLerp(car.roll || 0, target.data.roll, 0.28);
+    for (const [key, value] of Object.entries(target.data)) {
+      if (!['p','v','heading','pitch','roll'].includes(key) && value !== null) car[key] = value;
+    }
   }
 
   function pvpSend(event, payload = {}) {
@@ -3800,7 +3825,7 @@
 
   async function disconnectPvp(exitDrive = true) {
     const channel = state.pvp.channel;
-    state.pvp.active = false; state.pvp.connecting = false; state.pvp.connected = false; state.pvp.channel = null; state.pvp.role = null; state.pvp.team = null; state.pvp.opponentId = null; state.pvp.countdownEnd = 0;
+    state.pvp.active = false; state.pvp.connecting = false; state.pvp.connected = false; state.pvp.channel = null; state.pvp.role = null; state.pvp.team = null; state.pvp.opponentId = null; state.pvp.countdownEnd = 0; state.pvp.remoteTarget = null; state.pvp.remoteHitCooldown = 0;
     try { if (channel) { await channel.untrack(); await channel.unsubscribe(); } } catch (_) {}
     state.bot.car = null;
     setPvpStatus('');
@@ -3809,12 +3834,13 @@
 
   function updatePvpNetwork(now) {
     updatePvpCountdown();
+    updateRemoteCarSmoothing(now);
     if (!state.pvp.connected || !state.drive.car) return;
-    if (now - state.pvp.lastStateSend >= 50) {
+    if (now - state.pvp.lastStateSend >= 33) {
       state.pvp.lastStateSend = now;
       pvpSend('car-state', { car:serializeCar(state.drive.car) });
     }
-    if (state.pvp.role === 'host' && state.drive.ball && now - state.pvp.lastBallSend >= 50) {
+    if (state.pvp.role === 'host' && state.drive.ball && now - state.pvp.lastBallSend >= 33) {
       state.pvp.lastBallSend = now;
       pvpSend('ball-state', { ball:{p:{...state.drive.ball.p},v:{...state.drive.ball.v},w:{...state.drive.ball.w}} });
     }
@@ -4783,6 +4809,37 @@
         if (outSpeed > C.BALL_MAX_SPEED) state.drive.ball.v = mul(state.drive.ball.v, C.BALL_MAX_SPEED / outSpeed);
         state.drive.ball.p = add(state.drive.ball.p, mul(hit.normal, 4));
         state.drive.hitCooldown = 0.11;
+      }
+
+      // The host owns the ball simulation, so it must also resolve touches made
+      // by the joiner's remotely synchronized car. Previously only the host's
+      // local car was tested, which made the orange player pass through the ball.
+      state.pvp.remoteHitCooldown = Math.max(0, (state.pvp.remoteHitCooldown || 0) - step);
+      if (state.pvp.active && state.pvp.role === 'host' && state.bot.car && !state.goalCelebration.active) {
+        const remote = state.bot.car;
+        const remoteHit = sphereCarClearance(state.drive.ball.p, remote.p, remote.heading || 0, remote.pitch || 0);
+        if (remoteHit.clearance <= 0 && state.pvp.remoteHitCooldown <= 0) {
+          const remoteVelocity = remote.surfaceAxis && remote.surfaceForward
+            ? mul(remote.surfaceForward, remote.surfaceSpeed || 0)
+            : (remote.v || v3());
+          const rel = sub(state.drive.ball.v, remoteVelocity);
+          const normalSpeed = dot(rel, remoteHit.normal);
+          if (normalSpeed < 0) {
+            const invBallMass = 1 / C.MASS;
+            const invCarMass = 1 / C.CAR_MASS;
+            const impulseMagnitude = -(1 + 0.72) * normalSpeed / (invBallMass + invCarMass);
+            const impulse = mul(remoteHit.normal, impulseMagnitude);
+            state.drive.ball.v = add(state.drive.ball.v, mul(impulse, invBallMass));
+            const remoteFrame = driveCarFrame(remote);
+            const relativeSpeed = len(sub(state.drive.ball.v, remoteVelocity));
+            const hitNormal = psyonixBallHitNormal(state.drive.ball.p, remote.p, remoteFrame.forward);
+            state.drive.ball.v = add(state.drive.ball.v, mul(hitNormal, relativeSpeed * psyonixBallHitScale(relativeSpeed)));
+          }
+          const outSpeed = len(state.drive.ball.v);
+          if (outSpeed > C.BALL_MAX_SPEED) state.drive.ball.v = mul(state.drive.ball.v, C.BALL_MAX_SPEED / outSpeed);
+          state.drive.ball.p = add(state.drive.ball.p, mul(remoteHit.normal, 4));
+          state.pvp.remoteHitCooldown = 0.11;
+        }
       }
       emitBoostTrail(car, step);
     }
