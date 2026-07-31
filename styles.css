@@ -83,7 +83,7 @@ button { color: inherit; }
 }
 .phase-badge {
   position: absolute;
-  top: 8px;
+  top: 47px;
   left: 50%;
   transform: translateX(-50%);
   max-width: 72%;
@@ -648,3 +648,1737 @@ html, body, button, canvas, .stage-wrap, .trainer-panel, .drive-overlay, .joy-zo
 }
 button, canvas, .joy-zone, input[type="range"] { touch-action: none; }
 .drive-action.powerslide { background: rgba(126, 70, 174, .94); }
+
+/* v36 compact controller layout + floating stick */
+.drive-control-cluster {
+  position: absolute;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  width: 148px;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 5px;
+  pointer-events: auto;
+  z-index: 8;
+}
+.air-roll-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 0 5px;
+}
+.drive-diamond {
+  display: grid;
+  grid-template-columns: repeat(3, 42px);
+  grid-template-rows: repeat(3, 42px);
+  justify-content: center;
+  gap: 4px;
+}
+.drive-diamond .drive-action,
+.air-roll-row .drive-action,
+.drive-pedals .drive-action {
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border-radius: 12px;
+  font-size: .63rem;
+  line-height: 1;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+.drive-diamond .boost-powerslide { grid-column: 1; grid-row: 1; }
+.drive-diamond .diamond-camera    { grid-column: 2; grid-row: 1; }
+.drive-diamond .powerslide       { grid-column: 1; grid-row: 2; }
+.drive-diamond .boost            { grid-column: 3; grid-row: 2; }
+.drive-diamond .accel-powerslide { grid-column: 1; grid-row: 3; }
+.drive-diamond .jump             { grid-column: 2; grid-row: 3; }
+.drive-pedals {
+  display: grid;
+  grid-template-columns: 1.18fr .82fr;
+  gap: 5px;
+}
+.drive-pedals .pedal { height: 38px; font-size: .68rem; }
+.air-roll-row .compact { height: 29px; font-size: .6rem; border-radius: 10px; }
+.drive-action.camera { background: rgba(30,137,196,.94); }
+.drive-action.camera[aria-pressed="false"] { background: rgba(7,42,68,.92); }
+.drive-action.boost-powerslide { background: rgba(46,132,119,.95); }
+.drive-action.accel-powerslide { background: rgba(91,92,173,.95); }
+.drive-action.reverse { background: rgba(149,65,64,.94); }
+.drive-action.air-roll { background: rgba(80,68,138,.94); }
+
+body.drive-fullscreen .drive-control-cluster {
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  width: 148px;
+}
+body.drive-fullscreen .drive-diamond {
+  grid-template-columns: repeat(3, 42px);
+  grid-template-rows: repeat(3, 42px);
+}
+body.drive-fullscreen .drive-action {
+  min-width: 0;
+  min-height: 0;
+  font-size: .63rem;
+}
+body.drive-fullscreen .drive-pedals .pedal { height: 38px; font-size: .68rem; }
+body.drive-fullscreen .air-roll-row .compact { height: 29px; font-size: .6rem; }
+
+/* Keep the normal fixed stick available, but let it move under any free-space touch. */
+body.drive-fullscreen .joy-zone {
+  left: max(14px, env(safe-area-inset-left));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  width: 124px;
+  height: 124px;
+  z-index: 7;
+}
+body.drive-fullscreen .joy-base { width: 112px; height: 112px; }
+body.drive-fullscreen .joy-knob { width: 44px; height: 44px; }
+.joy-zone.floating {
+  left: var(--joy-x) !important;
+  top: var(--joy-y) !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.joy-zone.floating .joy-base {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 18px rgba(46,162,226,.22);
+}
+
+/* Keep telemetry away from the compact right-hand controls. */
+body.drive-fullscreen .speed-gauge {
+  left: max(12px, env(safe-area-inset-left));
+  right: auto;
+  top: max(10px, env(safe-area-inset-top));
+  bottom: auto;
+}
+
+@media (orientation: landscape) and (max-height: 440px) {
+  .drive-control-cluster,
+  body.drive-fullscreen .drive-control-cluster { width: 136px; right: max(7px, env(safe-area-inset-right)); bottom: max(7px, env(safe-area-inset-bottom)); gap: 3px; }
+  .drive-diamond,
+  body.drive-fullscreen .drive-diamond { grid-template-columns: repeat(3, 38px); grid-template-rows: repeat(3, 38px); gap: 3px; }
+  .drive-pedals { gap: 3px; }
+  .drive-pedals .pedal,
+  body.drive-fullscreen .drive-pedals .pedal { height: 33px; font-size: .59rem; }
+  .air-roll-row { gap: 3px; padding: 0 4px; }
+  .air-roll-row .compact,
+  body.drive-fullscreen .air-roll-row .compact { height: 25px; font-size: .54rem; }
+  .drive-diamond .drive-action,
+  body.drive-fullscreen .drive-action { font-size: .56rem; border-radius: 10px; }
+  body.drive-fullscreen .joy-zone { width: 112px; height: 112px; left: max(8px, env(safe-area-inset-left)); bottom: max(8px, env(safe-area-inset-bottom)); }
+  body.drive-fullscreen .joy-base { width: 102px; height: 102px; }
+  body.drive-fullscreen .joy-knob { width: 40px; height: 40px; }
+}
+
+/* v39 compact right-thumb cluster and unobstructed floating action branches */
+.drive-control-cluster,
+body.drive-fullscreen .drive-control-cluster {
+  position: absolute;
+  right: max(9px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  width: 142px;
+  height: 150px;
+  display: grid;
+  grid-template-columns: 38px 60px 38px;
+  grid-template-rows: 29px 62px 48px;
+  gap: 4px 3px;
+  pointer-events: auto;
+  z-index: 10;
+}
+.drive-control-cluster .drive-action,
+body.drive-fullscreen .drive-control-cluster .drive-action {
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border-radius: 11px;
+  font-size: .57rem;
+  line-height: 1;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+.drive-control-cluster .camera { grid-column: 2; grid-row: 1; }
+.drive-control-cluster .powerslide { grid-column: 1; grid-row: 2; align-self: center; height: 38px; }
+.drive-control-cluster .primary-accelerate {
+  grid-column: 2;
+  grid-row: 2;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: .69rem;
+  box-shadow: 0 5px 18px rgba(0,0,0,.28), inset 0 0 0 2px rgba(255,255,255,.07);
+}
+.drive-control-cluster .boost { grid-column: 3; grid-row: 2; align-self: center; height: 38px; }
+.drive-control-cluster .jump-below-accel {
+  grid-column: 2;
+  grid-row: 3;
+  height: 43px;
+  align-self: start;
+  border-radius: 15px;
+  font-size: .66rem;
+}
+.drive-control-cluster .reverse {
+  grid-column: 3;
+  grid-row: 3;
+  width: 36px;
+  height: 32px;
+  align-self: start;
+  justify-self: center;
+  font-size: .54rem;
+}
+.accel-branches {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 45px);
+  width: 184px;
+  height: 84px;
+  transform: translateX(-50%) scale(.88);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .08s linear, transform .08s linear;
+  z-index: 2;
+}
+.accel-branches.visible {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+.accel-branches::before,
+.accel-branches::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -72px;
+  width: 116px;
+  height: 2px;
+  background: rgba(146,222,255,.5);
+  transform-origin: 0 50%;
+}
+.accel-branches::before { transform: rotate(-54deg); }
+.accel-branches::after { transform: rotate(234deg); }
+.accel-branch {
+  position: absolute;
+  min-width: 49px;
+  height: 27px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  border: 1px solid rgba(180,231,255,.32);
+  background: rgba(5,39,62,.92);
+  color: #e9f8ff;
+  font-size: .51rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25);
+}
+.accel-branch.branch-left { left: 0; bottom: 1px; }
+.accel-branch.branch-center { left: 50%; top: 0; transform: translateX(-50%); min-width: 62px; }
+.accel-branch.branch-center::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 91px;
+  transform: translateX(-50%);
+  background: linear-gradient(rgba(146,222,255,.56), rgba(146,222,255,.12));
+  pointer-events: none;
+}
+.accel-branch.branch-right { right: 0; bottom: 1px; }
+.accel-branch.selected {
+  background: rgba(41,166,133,.98);
+  border-color: rgba(177,255,225,.78);
+  box-shadow: 0 0 16px rgba(64,235,180,.36);
+}
+.air-roll-dock,
+body.drive-fullscreen .air-roll-dock {
+  position: absolute;
+  width: 46px;
+  height: 31px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border-radius: 11px;
+  font-size: .57rem;
+  pointer-events: auto;
+  z-index: 11;
+}
+.air-roll-left {
+  left: max(47px, calc(env(safe-area-inset-left) + 47px));
+  bottom: max(142px, calc(env(safe-area-inset-bottom) + 142px));
+}
+.air-roll-right {
+  right: max(55px, calc(env(safe-area-inset-right) + 55px));
+  bottom: max(164px, calc(env(safe-area-inset-bottom) + 164px));
+}
+/* Any touch starting in these docks or the whole cluster must stay out of the floating stick. */
+.drive-control-cluster,
+.air-roll-dock { touch-action: none; }
+
+.supersonic-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .12s linear;
+  background:
+    linear-gradient(102deg, transparent 0 8%, rgba(218,246,255,.14) 8.3% 8.7%, transparent 9% 21%, rgba(218,246,255,.12) 21.3% 21.7%, transparent 22% 100%),
+    linear-gradient(78deg, transparent 0 72%, rgba(218,246,255,.11) 72.3% 72.7%, transparent 73% 88%, rgba(218,246,255,.14) 88.3% 88.7%, transparent 89% 100%);
+  mix-blend-mode: screen;
+  z-index: 4;
+}
+.stage-wrap.supersonic .supersonic-vignette { opacity: 1; }
+
+@media (orientation: landscape) and (max-height: 440px) {
+  .drive-control-cluster,
+  body.drive-fullscreen .drive-control-cluster {
+    width: 130px;
+    height: 137px;
+    grid-template-columns: 35px 54px 35px;
+    grid-template-rows: 26px 56px 43px;
+    right: max(6px, env(safe-area-inset-right));
+    bottom: max(5px, env(safe-area-inset-bottom));
+    gap: 3px;
+  }
+  .drive-control-cluster .primary-accelerate { width: 54px; height: 54px; font-size: .61rem; }
+  .drive-control-cluster .jump-below-accel { height: 39px; }
+  .drive-control-cluster .powerslide,
+  .drive-control-cluster .boost { height: 34px; }
+  .drive-control-cluster .reverse { width: 33px; height: 29px; }
+  .accel-branches { bottom: calc(100% + 38px); width: 166px; height: 74px; }
+  .accel-branch { min-width: 44px; height: 24px; font-size: .46rem; }
+  .accel-branch.branch-center { min-width: 56px; }
+  .accel-branch.branch-center::after { height: 80px; }
+  .air-roll-dock,
+  body.drive-fullscreen .air-roll-dock { width: 42px; height: 28px; font-size: .52rem; }
+  .air-roll-left { left: max(42px, calc(env(safe-area-inset-left) + 42px)); bottom: max(126px, calc(env(safe-area-inset-bottom) + 126px)); }
+  .air-roll-right { right: max(49px, calc(env(safe-area-inset-right) + 49px)); bottom: max(146px, calc(env(safe-area-inset-bottom) + 146px)); }
+}
+@keyframes supersonicRush {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: -180px 0, 180px 0; }
+}
+.stage-wrap.supersonic .supersonic-vignette {
+  animation: supersonicRush .24s linear infinite;
+}
+/* v39 alignment refinement: air-roll buttons share one horizon and the fan clears every permanent control. */
+.accel-branches { left: calc(50% - 9px); }
+.air-roll-left,
+.air-roll-right {
+  bottom: max(164px, calc(env(safe-area-inset-bottom) + 164px));
+}
+@media (orientation: landscape) and (max-height: 440px) {
+  .air-roll-left,
+  .air-roll-right {
+    bottom: max(162px, calc(env(safe-area-inset-bottom) + 162px));
+  }
+}
+
+
+/* Version 40 scoring HUD and goal celebration */
+.scoreboard {
+  position: absolute;
+  z-index: 7;
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: minmax(76px, auto) 24px minmax(76px, auto);
+  align-items: center;
+  min-height: 36px;
+  padding: 3px 7px;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 10px;
+  background: rgba(0, 10, 20, .84);
+  box-shadow: 0 4px 18px rgba(0,0,0,.38);
+  pointer-events: none;
+}
+.score-team { display: flex; align-items: center; justify-content: space-between; gap: 9px; }
+.score-team span { font-size: .62rem; font-weight: 800; letter-spacing: .12em; }
+.score-team b { min-width: 24px; text-align: center; font-size: 1.35rem; line-height: 1; }
+.blue-team { color: #65cfff; }
+.orange-team { color: #ffac58; }
+.score-divider { color: rgba(255,255,255,.72); text-align: center; font-size: 1.2rem; }
+
+.goal-celebration {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(255,255,255,.28), rgba(0,0,0,.12) 38%, rgba(0,0,0,.52));
+}
+.goal-celebration[hidden] { display: none; }
+.goal-celebration strong {
+  position: relative;
+  z-index: 5;
+  padding: 12px 22px;
+  border: 2px solid rgba(255,255,255,.78);
+  border-radius: 999px;
+  background: rgba(0,8,16,.74);
+  color: #fff;
+  font-size: clamp(1.45rem, 7vw, 3.6rem);
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-align: center;
+  text-shadow: 0 3px 0 rgba(0,0,0,.45), 0 0 24px currentColor;
+  opacity: 0;
+}
+.goal-flash, .goal-ring, .goal-burst { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.goal-flash {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 30px 18px currentColor, 0 0 100px 70px currentColor;
+  opacity: 0;
+}
+.goal-ring { width: 26px; height: 26px; border: 6px solid currentColor; border-radius: 50%; opacity: 0; }
+.goal-burst {
+  width: min(72vw, 520px); height: min(72vw, 520px); border-radius: 50%; opacity: 0;
+  background: repeating-conic-gradient(from 0deg, currentColor 0deg 5deg, transparent 5deg 12deg);
+  mask-image: radial-gradient(circle, transparent 0 20%, #000 22% 58%, transparent 72%);
+  -webkit-mask-image: radial-gradient(circle, transparent 0 20%, #000 22% 58%, transparent 72%);
+}
+.goal-celebration.blue-goal { color: #35b9ff; }
+.goal-celebration.orange-goal { color: #ff8d2f; }
+.goal-celebration.celebrating .goal-flash { animation: goalFlash 1.05s ease-out both; }
+.goal-celebration.celebrating .ring-one { animation: goalRing 1.4s ease-out .05s both; }
+.goal-celebration.celebrating .ring-two { animation: goalRing 1.55s ease-out .2s both; }
+.goal-celebration.celebrating .goal-burst { animation: goalBurst 1.65s ease-out .05s both; }
+.goal-celebration.celebrating strong { animation: goalText 2.15s cubic-bezier(.2,.85,.2,1) .16s both; }
+@keyframes goalFlash {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(.15); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(14); }
+}
+@keyframes goalRing {
+  0% { opacity: .95; transform: translate(-50%,-50%) scale(.2); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(18); border-width: 1px; }
+}
+@keyframes goalBurst {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(.08) rotate(0); }
+  16% { opacity: .95; }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(2.1) rotate(38deg); }
+}
+@keyframes goalText {
+  0% { opacity: 0; transform: scale(.4); }
+  18% { opacity: 1; transform: scale(1.16); }
+  34% { transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.06); }
+}
+
+@media (max-height: 560px) {
+  .scoreboard { top: 4px; min-height: 32px; }
+  .phase-badge { top: 40px; }
+  .score-team b { font-size: 1.15rem; }
+}
+
+
+/* V40.1: in-world goal explosion and compact straight branch layout */
+.goal-celebration {
+  inset: 8px auto auto 50%;
+  width: auto;
+  height: auto;
+  transform: translateX(-50%);
+  display: block;
+  overflow: visible;
+  background: transparent;
+  z-index: 12;
+}
+.goal-celebration .goal-flash,
+.goal-celebration .goal-ring,
+.goal-celebration .goal-burst { display: none; }
+.goal-celebration strong {
+  padding: 7px 14px;
+  font-size: clamp(.9rem, 3vw, 1.4rem);
+  background: rgba(0,8,16,.72);
+}
+
+.drive-control-cluster,
+body.drive-fullscreen .drive-control-cluster {
+  right: max(8px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  width: 184px;
+  height: 168px;
+  grid-template-columns: 48px 72px 48px;
+  grid-template-rows: 31px 46px 72px;
+  gap: 5px 4px;
+}
+.drive-control-cluster .camera { grid-column: 1; grid-row: 1; }
+.drive-control-cluster .powerslide { grid-column: 1; grid-row: 2; height: 42px; }
+.drive-control-cluster .boost { grid-column: 3; grid-row: 2; height: 42px; }
+.drive-control-cluster .primary-accelerate {
+  grid-column: 2;
+  grid-row: 3;
+  width: 72px;
+  height: 68px;
+  align-self: end;
+}
+.drive-control-cluster .jump-below-accel {
+  grid-column: 1;
+  grid-row: 3;
+  height: 50px;
+  align-self: end;
+}
+.drive-control-cluster .reverse {
+  grid-column: 3;
+  grid-row: 3;
+  width: 48px;
+  height: 42px;
+  align-self: end;
+}
+.accel-branches,
+body.drive-fullscreen .accel-branches {
+  left: 50%;
+  bottom: 70px;
+  width: 174px;
+  height: 60px;
+  transform: translateX(-50%) scale(.94);
+}
+.accel-branches.visible { transform: translateX(-50%) scale(1); }
+.accel-branches::before,
+.accel-branches::after {
+  left: 50%;
+  bottom: -13px;
+  width: 69px;
+  transform-origin: 0 50%;
+}
+.accel-branches::before { transform: rotate(180deg); }
+.accel-branches::after { transform: rotate(0deg); }
+.accel-branch.branch-left { left: 0; top: 28px; bottom: auto; }
+.accel-branch.branch-center { left: 50%; top: 0; }
+.accel-branch.branch-right { right: 0; top: 28px; bottom: auto; }
+.accel-branch.branch-center::after {
+  top: 100%;
+  height: 42px;
+}
+.air-roll-right {
+  right: max(199px, calc(env(safe-area-inset-right) + 199px));
+  bottom: max(68px, calc(env(safe-area-inset-bottom) + 68px));
+}
+
+
+/* v40.2: restore the slide-jump stack and reserve a clean, non-overlapping combo fan. */
+.drive-control-cluster,
+body.drive-fullscreen .drive-control-cluster {
+  right: max(8px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  width: 184px;
+  height: 192px;
+  grid-template-columns: 48px 76px 48px;
+  grid-template-rows: 52px 48px 68px;
+  gap: 6px 6px;
+  overflow: visible;
+}
+.drive-control-cluster .camera {
+  grid-column: 1;
+  grid-row: 1;
+  width: 48px;
+  height: 34px;
+  align-self: start;
+}
+.drive-control-cluster .powerslide {
+  grid-column: 1;
+  grid-row: 2;
+  width: 48px;
+  height: 42px;
+  align-self: center;
+}
+.drive-control-cluster .primary-accelerate {
+  grid-column: 2;
+  grid-row: 2;
+  width: 76px;
+  height: 62px;
+  align-self: center;
+  border-radius: 13px;
+}
+.drive-control-cluster .boost {
+  grid-column: 3;
+  grid-row: 2;
+  width: 48px;
+  height: 42px;
+  align-self: center;
+}
+.drive-control-cluster .jump-below-accel {
+  grid-column: 2;
+  grid-row: 3;
+  width: 76px;
+  height: 54px;
+  align-self: start;
+  border-radius: 13px;
+}
+.drive-control-cluster .reverse {
+  grid-column: 3;
+  grid-row: 3;
+  width: 48px;
+  height: 42px;
+  align-self: start;
+}
+.accel-branches,
+body.drive-fullscreen .accel-branches {
+  left: 50%;
+  bottom: 137px;
+  width: 184px;
+  height: 50px;
+  transform: translateX(-50%) scale(.94);
+  transform-origin: 50% 100%;
+  z-index: 20;
+}
+.accel-branches.visible { transform: translateX(-50%) scale(1); }
+.accel-branches::before,
+.accel-branches::after {
+  left: 50%;
+  bottom: 14px;
+  width: 62px;
+  height: 2px;
+  transform-origin: 0 50%;
+}
+.accel-branches::before { transform: rotate(180deg); }
+.accel-branches::after { transform: rotate(0deg); }
+.accel-branch.branch-left {
+  left: 0;
+  top: 21px;
+  bottom: auto;
+}
+.accel-branch.branch-center {
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+.accel-branch.branch-right {
+  right: 0;
+  top: 21px;
+  bottom: auto;
+}
+.accel-branch.branch-center::after {
+  top: 100%;
+  height: 38px;
+}
+.air-roll-right {
+  right: max(202px, calc(env(safe-area-inset-right) + 202px));
+  bottom: max(72px, calc(env(safe-area-inset-bottom) + 72px));
+}
+@media (orientation: landscape) and (max-height: 540px) {
+  .drive-control-cluster,
+  body.drive-fullscreen .drive-control-cluster {
+    width: 168px;
+    height: 166px;
+    grid-template-columns: 44px 68px 44px;
+    grid-template-rows: 43px 43px 58px;
+    gap: 5px 6px;
+  }
+  .drive-control-cluster .primary-accelerate { width: 68px; height: 56px; }
+  .drive-control-cluster .jump-below-accel { width: 68px; height: 47px; }
+  .accel-branches,
+  body.drive-fullscreen .accel-branches { bottom: 119px; width: 168px; height: 45px; }
+  .air-roll-right { right: max(184px, calc(env(safe-area-inset-right) + 184px)); }
+}
+
+
+/* v40.3: deliberate slide-jump spacing and safer thumb separation. */
+.drive-control-cluster,
+body.drive-fullscreen .drive-control-cluster {
+  height: 214px;
+  grid-template-columns: 48px 76px 48px;
+  grid-template-rows: 52px 62px 18px 54px;
+  gap: 6px 6px;
+}
+.drive-control-cluster .camera { grid-column: 1; grid-row: 1; }
+.drive-control-cluster .powerslide { grid-column: 1; grid-row: 2; }
+.drive-control-cluster .primary-accelerate {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
+}
+.drive-control-cluster .boost { grid-column: 3; grid-row: 2; }
+.drive-control-cluster .jump-below-accel {
+  grid-column: 2;
+  grid-row: 4;
+  align-self: start;
+}
+.drive-control-cluster .reverse {
+  grid-column: 3;
+  grid-row: 4;
+  align-self: start;
+}
+.accel-branches,
+body.drive-fullscreen .accel-branches {
+  bottom: 159px;
+}
+
+
+/* v40.4: align fork choices over the controls they combine with. */
+.accel-branches,
+body.drive-fullscreen .accel-branches {
+  left: 0;
+  width: 184px;
+  transform: scale(.94);
+  transform-origin: 50% 100%;
+}
+.accel-branches.visible { transform: scale(1); }
+.accel-branch.branch-left {
+  left: 24px;
+  right: auto;
+  top: 20px;
+  transform: translateX(-50%);
+}
+.accel-branch.branch-center {
+  left: 92px;
+  top: 0;
+  transform: translateX(-50%);
+}
+.accel-branch.branch-right {
+  left: 160px;
+  right: auto;
+  top: 20px;
+  transform: translateX(-50%);
+}
+.accel-branches::before,
+.accel-branches::after {
+  bottom: 8px;
+  width: 68px;
+}
+.accel-branches::before {
+  left: 92px;
+  transform: rotate(180deg);
+}
+.accel-branches::after {
+  left: 92px;
+  transform: rotate(0deg);
+}
+
+/* v40.6: true left / up / right acceleration fork layout. */
+.drive-control-cluster,
+body.drive-fullscreen .drive-control-cluster {
+  /* Reserve space on the right so A+BST can sit beside Boost without clipping. */
+  right: max(62px, calc(env(safe-area-inset-right) + 62px));
+}
+.accel-branches,
+body.drive-fullscreen .accel-branches {
+  /* Covers the cluster plus one branch-button width on each side. */
+  left: -30px;
+  top: 0;
+  bottom: auto;
+  width: 244px;
+  height: 214px;
+  transform: scale(.94);
+  transform-origin: 50% 50%;
+}
+.accel-branches.visible {
+  transform: scale(1);
+}
+/* A+PS is directly LEFT of Powerslide, vertically centered with it. */
+.accel-branch.branch-left {
+  left: 0;
+  right: auto;
+  top: 66px;
+  bottom: auto;
+  transform: none;
+}
+/* The three-way combo remains directly ABOVE Accelerate. */
+.accel-branch.branch-center {
+  left: 122px;
+  top: 22px;
+  bottom: auto;
+  transform: translateX(-50%);
+}
+/* A+BST is directly RIGHT of Boost, vertically centered with it. */
+.accel-branch.branch-right {
+  left: auto;
+  right: 0;
+  top: 66px;
+  bottom: auto;
+  transform: none;
+}
+/* Horizontal guide segments from the side choices to their base controls. */
+.accel-branches::before,
+.accel-branches::after {
+  top: 79px;
+  bottom: auto;
+  width: 29px;
+  height: 2px;
+  transform: none;
+}
+.accel-branches::before { left: 49px; }
+.accel-branches::after { left: 166px; }
+.accel-branch.branch-center::after {
+  top: 100%;
+  height: 9px;
+}
+@media (orientation: landscape) and (max-height: 540px) {
+  .drive-control-cluster,
+  body.drive-fullscreen .drive-control-cluster {
+    right: max(58px, calc(env(safe-area-inset-right) + 58px));
+  }
+  .accel-branches,
+  body.drive-fullscreen .accel-branches {
+    left: -28px;
+    width: 224px;
+    height: 166px;
+  }
+  .accel-branch.branch-left,
+  .accel-branch.branch-right { top: 57px; }
+  .accel-branch.branch-center { left: 112px; top: 14px; }
+  .accel-branches::before,
+  .accel-branches::after { top: 69px; width: 27px; }
+  .accel-branches::before { left: 44px; }
+  .accel-branches::after { left: 153px; }
+}
+
+/* v40.7 — rebuilt cardinal control grid.
+   This deliberately replaces every earlier fork-position override. */
+.drive-control-cluster,
+body.drive-fullscreen .drive-control-cluster {
+  position: absolute;
+  right: max(8px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  width: min(340px, calc(100vw - 224px));
+  min-width: 304px;
+  height: 198px;
+  display: grid;
+  grid-template-columns: 52px 62px minmax(78px, 88px) 62px 52px;
+  grid-template-rows: 38px 70px 18px 58px;
+  column-gap: 6px;
+  row-gap: 5px;
+  overflow: visible;
+  pointer-events: auto;
+  z-index: 20;
+}
+
+.drive-control-cluster .drive-action,
+body.drive-fullscreen .drive-control-cluster .drive-action {
+  position: static;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  align-self: stretch;
+  justify-self: stretch;
+  border-radius: 13px;
+}
+
+/* Permanent controls occupy fixed cells and can never collide with branches. */
+.drive-control-cluster .camera {
+  grid-column: 2;
+  grid-row: 1;
+  width: 62px;
+  height: 38px;
+}
+.drive-control-cluster .powerslide {
+  grid-column: 2;
+  grid-row: 2;
+  width: 62px;
+  height: 70px;
+}
+.drive-control-cluster .primary-accelerate {
+  grid-column: 3;
+  grid-row: 2;
+  width: 100%;
+  height: 70px;
+  border-radius: 14px;
+}
+.drive-control-cluster .boost {
+  grid-column: 4;
+  grid-row: 2;
+  width: 62px;
+  height: 70px;
+}
+.drive-control-cluster .jump-below-accel {
+  grid-column: 3;
+  grid-row: 4;
+  width: 100%;
+  height: 58px;
+  border-radius: 14px;
+}
+.drive-control-cluster .reverse {
+  grid-column: 4;
+  grid-row: 4;
+  width: 62px;
+  height: 58px;
+}
+
+/* The branch wrapper participates in the grid instead of floating over it. */
+.accel-branches,
+body.drive-fullscreen .accel-branches {
+  display: contents;
+  position: static;
+  width: auto;
+  height: auto;
+  transform: none;
+  pointer-events: none;
+}
+.accel-branches::before,
+.accel-branches::after,
+.accel-branch::after {
+  display: none !important;
+}
+.accel-branch {
+  position: static;
+  inset: auto;
+  transform: none !important;
+  width: 52px;
+  height: 36px;
+  padding: 0 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: stretch;
+  align-self: center;
+  border-radius: 11px;
+  font-size: .56rem;
+  line-height: 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .1s ease, visibility .1s ease, filter .1s ease;
+  pointer-events: none;
+}
+.accel-branches.visible .accel-branch {
+  opacity: 1;
+  visibility: visible;
+}
+.accel-branch.branch-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+.accel-branch.branch-center {
+  grid-column: 3;
+  grid-row: 1;
+  width: 100%;
+  height: 38px;
+}
+.accel-branch.branch-right {
+  grid-column: 5;
+  grid-row: 2;
+}
+.accel-branch.selected {
+  opacity: 1;
+  visibility: visible;
+  filter: brightness(1.35);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.7), 0 0 14px rgba(67,190,255,.5);
+}
+
+/* Keep AR-R outside the reserved grid rather than inside its hit region. */
+.air-roll-right {
+  right: max(354px, calc(env(safe-area-inset-right) + 354px));
+  bottom: max(72px, calc(env(safe-area-inset-bottom) + 72px));
+}
+
+@media (max-width: 560px) {
+  .drive-control-cluster,
+  body.drive-fullscreen .drive-control-cluster {
+    width: 304px;
+    min-width: 304px;
+    grid-template-columns: 44px 56px 80px 56px 44px;
+    column-gap: 6px;
+  }
+  .drive-control-cluster .camera,
+  .drive-control-cluster .powerslide,
+  .drive-control-cluster .boost,
+  .drive-control-cluster .reverse { width: 56px; }
+  .accel-branch { width: 44px; font-size: .51rem; }
+  .air-roll-right {
+    right: max(316px, calc(env(safe-area-inset-right) + 316px));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .drive-control-cluster,
+  body.drive-fullscreen .drive-control-cluster {
+    width: 296px;
+    min-width: 296px;
+    height: 166px;
+    grid-template-columns: 42px 54px 74px 54px 42px;
+    grid-template-rows: 32px 58px 14px 48px;
+    column-gap: 5px;
+    row-gap: 4px;
+  }
+  .drive-control-cluster .camera { width: 54px; height: 32px; }
+  .drive-control-cluster .powerslide,
+  .drive-control-cluster .boost { width: 54px; height: 58px; }
+  .drive-control-cluster .primary-accelerate { height: 58px; }
+  .drive-control-cluster .jump-below-accel { height: 48px; }
+  .drive-control-cluster .reverse { width: 54px; height: 48px; }
+  .accel-branch { width: 42px; height: 31px; font-size: .48rem; }
+  .accel-branch.branch-center { height: 32px; }
+  .air-roll-right {
+    right: max(307px, calc(env(safe-area-inset-right) + 307px));
+    bottom: max(58px, calc(env(safe-area-inset-bottom) + 58px));
+  }
+}
+
+/* v41.3 — unified anchored drive-control system.
+   All action controls now belong to one responsive grid; no free-floating button offsets. */
+.drive-controls-system,
+body.drive-fullscreen .drive-controls-system {
+  position: absolute;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  z-index: 24;
+  display: grid;
+  grid-template-columns: 58px auto;
+  align-items: end;
+  gap: 10px;
+  width: min(394px, calc(100vw - 212px));
+  min-width: 342px;
+  pointer-events: none;
+  touch-action: none;
+}
+
+.drive-controls-system .air-roll-rail {
+  display: grid;
+  grid-template-rows: repeat(2, 48px);
+  gap: 10px;
+  align-self: end;
+  padding-bottom: 59px;
+  pointer-events: auto;
+}
+
+.drive-controls-system .air-roll-rail .drive-action {
+  position: static !important;
+  inset: auto !important;
+  width: 58px;
+  height: 48px;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border-radius: 14px;
+  font-size: .66rem;
+}
+
+.drive-controls-system .drive-control-cluster,
+body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+  position: static;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  display: grid;
+  grid-template-columns: 48px 66px minmax(84px, 94px) 66px 48px;
+  grid-template-rows: 40px 76px 10px 58px;
+  gap: 7px;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+.drive-controls-system .drive-control-cluster .drive-action,
+body.drive-fullscreen .drive-controls-system .drive-control-cluster .drive-action {
+  position: static !important;
+  inset: auto !important;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  align-self: stretch;
+  justify-self: stretch;
+  border-radius: 14px;
+}
+
+/* Parent controls form the stable three-column core. */
+.drive-controls-system .camera {
+  grid-column: 2;
+  grid-row: 1;
+}
+.drive-controls-system .powerslide {
+  grid-column: 2;
+  grid-row: 2;
+}
+.drive-controls-system .primary-accelerate {
+  grid-column: 3;
+  grid-row: 2;
+  border-radius: 16px;
+}
+.drive-controls-system .boost {
+  grid-column: 4;
+  grid-row: 2;
+}
+.drive-controls-system .jump-below-accel {
+  grid-column: 3;
+  grid-row: 4;
+  border-radius: 15px;
+}
+.drive-controls-system .reverse {
+  grid-column: 4;
+  grid-row: 4;
+}
+
+/* Combo choices are grid cells attached to the controls they combine with. */
+.drive-controls-system .accel-branches,
+body.drive-fullscreen .drive-controls-system .accel-branches {
+  display: contents;
+  position: static;
+  width: auto;
+  height: auto;
+  transform: none;
+  pointer-events: none;
+}
+.drive-controls-system .accel-branches::before,
+.drive-controls-system .accel-branches::after,
+.drive-controls-system .accel-branch::after {
+  display: none !important;
+}
+.drive-controls-system .accel-branch {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  width: 100%;
+  height: 36px;
+  min-width: 0;
+  padding: 0 2px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  justify-self: stretch;
+  border-radius: 11px;
+  font-size: .52rem;
+  line-height: 1;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .1s ease, visibility .1s ease, filter .1s ease;
+}
+.drive-controls-system .accel-branches.visible .accel-branch {
+  opacity: 1;
+  visibility: visible;
+}
+.drive-controls-system .accel-branch.branch-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+.drive-controls-system .accel-branch.branch-center {
+  grid-column: 3;
+  grid-row: 1;
+  height: 40px;
+}
+.drive-controls-system .accel-branch.branch-right {
+  grid-column: 5;
+  grid-row: 2;
+}
+.drive-controls-system .accel-branch.selected {
+  opacity: 1;
+  visibility: visible;
+  filter: brightness(1.3);
+}
+
+/* Retire all legacy free-floating air-roll positioning. */
+.drive-controls-system .air-roll-left,
+.drive-controls-system .air-roll-right {
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+}
+
+@media (max-width: 620px) {
+  .drive-controls-system,
+  body.drive-fullscreen .drive-controls-system {
+    width: min(356px, calc(100vw - 190px));
+    min-width: 314px;
+    grid-template-columns: 52px auto;
+    gap: 7px;
+  }
+  .drive-controls-system .air-roll-rail {
+    grid-template-rows: repeat(2, 44px);
+    gap: 8px;
+    padding-bottom: 54px;
+  }
+  .drive-controls-system .air-roll-rail .drive-action {
+    width: 52px;
+    height: 44px;
+    font-size: .59rem;
+  }
+  .drive-controls-system .drive-control-cluster,
+  body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+    grid-template-columns: 42px 58px minmax(76px, 86px) 58px 42px;
+    grid-template-rows: 36px 68px 8px 52px;
+    gap: 5px;
+  }
+  .drive-controls-system .accel-branch { height: 32px; font-size: .46rem; }
+  .drive-controls-system .accel-branch.branch-center { height: 36px; }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .drive-controls-system,
+  body.drive-fullscreen .drive-controls-system {
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(7px, env(safe-area-inset-bottom));
+    width: min(338px, calc(100vw - 188px));
+    min-width: 300px;
+    grid-template-columns: 48px auto;
+    gap: 6px;
+  }
+  .drive-controls-system .air-roll-rail {
+    grid-template-rows: repeat(2, 40px);
+    gap: 7px;
+    padding-bottom: 48px;
+  }
+  .drive-controls-system .air-roll-rail .drive-action {
+    width: 48px;
+    height: 40px;
+    font-size: .53rem;
+  }
+  .drive-controls-system .drive-control-cluster,
+  body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+    grid-template-columns: 40px 54px minmax(72px, 80px) 54px 40px;
+    grid-template-rows: 32px 60px 7px 46px;
+    gap: 4px;
+  }
+  .drive-controls-system .accel-branch { height: 29px; font-size: .43rem; }
+  .drive-controls-system .accel-branch.branch-center { height: 32px; }
+}
+
+/* v41.4 — literal three-column stacked fork layout.
+   Every acceleration fork is centered directly above its matching base control. */
+.drive-controls-system,
+body.drive-fullscreen .drive-controls-system {
+  width: min(374px, calc(100vw - 194px));
+  min-width: 324px;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 9px;
+}
+
+.drive-controls-system .air-roll-rail {
+  grid-template-rows: repeat(2, 48px);
+  padding-bottom: 0;
+  align-self: center;
+}
+
+.drive-controls-system .drive-control-cluster,
+body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+  grid-template-columns: 66px minmax(88px, 98px) 66px;
+  grid-template-rows: 38px 76px 58px;
+  column-gap: 8px;
+  row-gap: 7px;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+}
+
+/* Fork row: exact same columns and center lines as PS / ACCEL / BST. */
+.drive-controls-system .accel-branch.branch-left {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  height: 38px !important;
+}
+.drive-controls-system .accel-branch.branch-center {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  height: 38px !important;
+}
+.drive-controls-system .accel-branch.branch-right {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  height: 38px !important;
+}
+
+/* Matching base row. */
+.drive-controls-system .powerslide {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+}
+.drive-controls-system .primary-accelerate {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+}
+.drive-controls-system .boost {
+  grid-column: 3 !important;
+  grid-row: 2 !important;
+}
+
+/* Utility row keeps BCAM out of the fork row entirely. */
+.drive-controls-system .camera {
+  grid-column: 1 !important;
+  grid-row: 3 !important;
+  width: 100% !important;
+  height: 58px !important;
+}
+.drive-controls-system .jump-below-accel {
+  grid-column: 2 !important;
+  grid-row: 3 !important;
+  width: 100% !important;
+  height: 58px !important;
+}
+.drive-controls-system .reverse {
+  grid-column: 3 !important;
+  grid-row: 3 !important;
+  width: 100% !important;
+  height: 58px !important;
+}
+
+.drive-controls-system .accel-branch {
+  font-size: .5rem;
+  padding: 0 2px;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .drive-controls-system,
+  body.drive-fullscreen .drive-controls-system {
+    width: min(344px, calc(100vw - 180px));
+    min-width: 300px;
+    grid-template-columns: 50px minmax(0, 1fr);
+    gap: 7px;
+  }
+  .drive-controls-system .air-roll-rail {
+    grid-template-rows: repeat(2, 44px);
+  }
+  .drive-controls-system .drive-control-cluster,
+  body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+    grid-template-columns: 60px minmax(80px, 90px) 60px;
+    grid-template-rows: 34px 68px 52px;
+    column-gap: 6px;
+    row-gap: 6px;
+  }
+  .drive-controls-system .accel-branch.branch-left,
+  .drive-controls-system .accel-branch.branch-center,
+  .drive-controls-system .accel-branch.branch-right {
+    height: 34px !important;
+  }
+  .drive-controls-system .camera,
+  .drive-controls-system .jump-below-accel,
+  .drive-controls-system .reverse {
+    height: 52px !important;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .drive-controls-system,
+  body.drive-fullscreen .drive-controls-system {
+    width: min(324px, calc(100vw - 174px));
+    min-width: 286px;
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 6px;
+  }
+  .drive-controls-system .air-roll-rail {
+    grid-template-rows: repeat(2, 40px);
+    gap: 7px;
+  }
+  .drive-controls-system .drive-control-cluster,
+  body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+    grid-template-columns: 56px minmax(74px, 84px) 56px;
+    grid-template-rows: 31px 58px 46px;
+    column-gap: 5px;
+    row-gap: 5px;
+  }
+  .drive-controls-system .accel-branch.branch-left,
+  .drive-controls-system .accel-branch.branch-center,
+  .drive-controls-system .accel-branch.branch-right {
+    height: 31px !important;
+  }
+  .drive-controls-system .camera,
+  .drive-controls-system .jump-below-accel,
+  .drive-controls-system .reverse {
+    height: 46px !important;
+  }
+  .drive-controls-system .accel-branch { font-size: .43rem; }
+}
+
+/* v41.5 — true overlapping fork layers.
+   Each acceleration-combo button occupies the exact same grid cell and rectangle
+   as the base button it replaces. There is no separate fork row. */
+.drive-controls-system .drive-control-cluster,
+body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+  grid-template-rows: 76px 58px !important;
+}
+
+.drive-controls-system .powerslide,
+.drive-controls-system .accel-branch.branch-left {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  height: 76px !important;
+}
+
+.drive-controls-system .primary-accelerate,
+.drive-controls-system .accel-branch.branch-center {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  height: 76px !important;
+}
+
+.drive-controls-system .boost,
+.drive-controls-system .accel-branch.branch-right {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  height: 76px !important;
+}
+
+/* Base controls stay beneath the fork layer. */
+.drive-controls-system .powerslide,
+.drive-controls-system .primary-accelerate,
+.drive-controls-system .boost {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* When the fork menu is visible, each combo replaces its base button in-place. */
+.drive-controls-system .accel-branch {
+  position: relative !important;
+  z-index: 3 !important;
+  border-radius: 18px !important;
+  font-size: .68rem !important;
+}
+
+.drive-controls-system .camera {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+}
+.drive-controls-system .jump-below-accel {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+}
+.drive-controls-system .reverse {
+  grid-column: 3 !important;
+  grid-row: 2 !important;
+}
+
+@media (max-width: 620px) {
+  .drive-controls-system .drive-control-cluster,
+  body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+    grid-template-rows: 68px 52px !important;
+  }
+  .drive-controls-system .powerslide,
+  .drive-controls-system .primary-accelerate,
+  .drive-controls-system .boost,
+  .drive-controls-system .accel-branch.branch-left,
+  .drive-controls-system .accel-branch.branch-center,
+  .drive-controls-system .accel-branch.branch-right {
+    height: 68px !important;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .drive-controls-system .drive-control-cluster,
+  body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+    grid-template-rows: 58px 46px !important;
+  }
+  .drive-controls-system .powerslide,
+  .drive-controls-system .primary-accelerate,
+  .drive-controls-system .boost,
+  .drive-controls-system .accel-branch.branch-left,
+  .drive-controls-system .accel-branch.branch-center,
+  .drive-controls-system .accel-branch.branch-right {
+    height: 58px !important;
+  }
+  .drive-controls-system .accel-branch { font-size: .58rem !important; }
+}
+
+/* v41.6 — spatial fork gesture + separated air-roll controls.
+   Side forks remain literal overlays; the three-button combo is moved above
+   Accelerate so the thumb has a real upward destination. */
+.drive-controls-system .drive-control-cluster,
+body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+  grid-template-rows: 44px 76px 58px !important;
+}
+
+/* A+PS and A+BST still occupy the exact same rectangles as their bases. */
+.drive-controls-system .powerslide,
+.drive-controls-system .accel-branch.branch-left {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  width: 100% !important;
+  height: 76px !important;
+}
+.drive-controls-system .primary-accelerate {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  width: 100% !important;
+  height: 76px !important;
+}
+.drive-controls-system .boost,
+.drive-controls-system .accel-branch.branch-right {
+  grid-column: 3 !important;
+  grid-row: 2 !important;
+  width: 100% !important;
+  height: 76px !important;
+}
+
+/* The center combo is the sole upward branch. */
+.drive-controls-system .accel-branch.branch-center {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  height: 40px !important;
+  align-self: end !important;
+}
+
+.drive-controls-system .camera { grid-column: 1 !important; grid-row: 3 !important; }
+.drive-controls-system .jump-below-accel { grid-column: 2 !important; grid-row: 3 !important; }
+.drive-controls-system .reverse { grid-column: 3 !important; grid-row: 3 !important; }
+
+/* Air roll is no longer part of the crowded bottom cluster. */
+.drive-controls-system .air-roll-rail,
+body.drive-fullscreen .drive-controls-system .air-roll-rail {
+  position: fixed !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+  z-index: 9 !important;
+}
+.drive-controls-system .air-roll-rail .drive-action,
+body.drive-fullscreen .drive-controls-system .air-roll-rail .drive-action {
+  position: absolute !important;
+  width: 66px !important;
+  height: 50px !important;
+  margin: 0 !important;
+  pointer-events: auto !important;
+}
+.drive-controls-system .air-roll-left,
+body.drive-fullscreen .drive-controls-system .air-roll-left {
+  left: max(14px, env(safe-area-inset-left)) !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: max(190px, calc(env(safe-area-inset-bottom) + 190px)) !important;
+}
+.drive-controls-system .air-roll-right,
+body.drive-fullscreen .drive-controls-system .air-roll-right {
+  right: max(14px, env(safe-area-inset-right)) !important;
+  left: auto !important;
+  top: auto !important;
+  bottom: max(190px, calc(env(safe-area-inset-bottom) + 190px)) !important;
+}
+
+@media (max-width: 620px) {
+  .drive-controls-system .drive-control-cluster,
+  body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+    grid-template-rows: 38px 68px 52px !important;
+  }
+  .drive-controls-system .powerslide,
+  .drive-controls-system .primary-accelerate,
+  .drive-controls-system .boost,
+  .drive-controls-system .accel-branch.branch-left,
+  .drive-controls-system .accel-branch.branch-right {
+    height: 68px !important;
+  }
+  .drive-controls-system .accel-branch.branch-center { height: 35px !important; }
+  .drive-controls-system .air-roll-rail .drive-action,
+  body.drive-fullscreen .drive-controls-system .air-roll-rail .drive-action {
+    width: 58px !important;
+    height: 44px !important;
+  }
+  .drive-controls-system .air-roll-left,
+  .drive-controls-system .air-roll-right,
+  body.drive-fullscreen .drive-controls-system .air-roll-left,
+  body.drive-fullscreen .drive-controls-system .air-roll-right {
+    bottom: max(168px, calc(env(safe-area-inset-bottom) + 168px)) !important;
+  }
+}
+
+/* v41.7 — right-shifted action cluster and lowered side air-roll controls.
+   The action cluster is deliberately narrower and anchored to the right edge so
+   it no longer intrudes into the steering-stick area. */
+.drive-controls-system,
+body.drive-fullscreen .drive-controls-system {
+  right: max(8px, env(safe-area-inset-right)) !important;
+  width: min(340px, calc(100vw - 148px)) !important;
+  min-width: 0 !important;
+  grid-template-columns: 1fr !important;
+  gap: 0 !important;
+}
+
+.drive-controls-system .drive-control-cluster,
+body.drive-fullscreen .drive-controls-system .drive-control-cluster {
+  width: 100% !important;
+  justify-self: end !important;
+}
+
+/* Keep the side air-roll controls near the lower control zone instead of
+   floating high up the screen. */
+.drive-controls-system .air-roll-left,
+body.drive-fullscreen .drive-controls-system .air-roll-left {
+  left: max(14px, env(safe-area-inset-left)) !important;
+  right: auto !important;
+  bottom: max(142px, calc(env(safe-area-inset-bottom) + 142px)) !important;
+}
+.drive-controls-system .air-roll-right,
+body.drive-fullscreen .drive-controls-system .air-roll-right {
+  right: max(14px, env(safe-area-inset-right)) !important;
+  left: auto !important;
+  bottom: max(142px, calc(env(safe-area-inset-bottom) + 142px)) !important;
+}
+
+@media (max-width: 620px) {
+  .drive-controls-system,
+  body.drive-fullscreen .drive-controls-system {
+    width: min(318px, calc(100vw - 138px)) !important;
+    right: max(6px, env(safe-area-inset-right)) !important;
+  }
+  .drive-controls-system .air-roll-left,
+  .drive-controls-system .air-roll-right,
+  body.drive-fullscreen .drive-controls-system .air-roll-left,
+  body.drive-fullscreen .drive-controls-system .air-roll-right {
+    bottom: max(128px, calc(env(safe-area-inset-bottom) + 128px)) !important;
+  }
+}
+
+/* v41.8 — final lower-control positioning correction.
+   Narrowing a right-anchored cluster moves its entire left edge farther right.
+   Air-roll buttons are placed immediately above their respective lower controls. */
+.drive-controls-system,
+body.drive-fullscreen .drive-controls-system {
+  right: max(2px, env(safe-area-inset-right)) !important;
+  width: min(300px, calc(100vw - 158px)) !important;
+}
+
+.drive-controls-system .air-roll-left,
+body.drive-fullscreen .drive-controls-system .air-roll-left {
+  left: max(18px, env(safe-area-inset-left)) !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: max(76px, calc(env(safe-area-inset-bottom) + 76px)) !important;
+}
+.drive-controls-system .air-roll-right,
+body.drive-fullscreen .drive-controls-system .air-roll-right {
+  right: max(18px, env(safe-area-inset-right)) !important;
+  left: auto !important;
+  top: auto !important;
+  bottom: max(76px, calc(env(safe-area-inset-bottom) + 76px)) !important;
+}
+
+@media (max-width: 620px) {
+  .drive-controls-system,
+  body.drive-fullscreen .drive-controls-system {
+    right: max(2px, env(safe-area-inset-right)) !important;
+    width: min(292px, calc(100vw - 158px)) !important;
+  }
+
+  .drive-controls-system .air-roll-left,
+  .drive-controls-system .air-roll-right,
+  body.drive-fullscreen .drive-controls-system .air-roll-left,
+  body.drive-fullscreen .drive-controls-system .air-roll-right {
+    bottom: max(68px, calc(env(safe-area-inset-bottom) + 68px)) !important;
+  }
+}
+
+/* v41.9 — viewport-anchored air-roll controls.
+   These buttons are deliberately outside the transformed action cluster so
+   their bottom offsets are measured from the actual phone screen. */
+.drive-overlay > .viewport-air-roll-rail {
+  position: fixed !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  pointer-events: none !important;
+  z-index: 12 !important;
+  transform: none !important;
+}
+.drive-overlay > .viewport-air-roll-rail .drive-action {
+  position: fixed !important;
+  top: auto !important;
+  width: 66px !important;
+  height: 50px !important;
+  margin: 0 !important;
+  pointer-events: auto !important;
+  transform: none !important;
+}
+.drive-overlay > .viewport-air-roll-rail .air-roll-left {
+  left: max(18px, env(safe-area-inset-left)) !important;
+  right: auto !important;
+  bottom: max(174px, calc(env(safe-area-inset-bottom) + 174px)) !important;
+}
+.drive-overlay > .viewport-air-roll-rail .air-roll-right {
+  right: max(18px, env(safe-area-inset-right)) !important;
+  left: auto !important;
+  bottom: max(174px, calc(env(safe-area-inset-bottom) + 174px)) !important;
+}
+@media (max-width: 620px) {
+  .drive-overlay > .viewport-air-roll-rail .drive-action {
+    width: 58px !important;
+    height: 44px !important;
+  }
+  .drive-overlay > .viewport-air-roll-rail .air-roll-left,
+  .drive-overlay > .viewport-air-roll-rail .air-roll-right {
+    bottom: max(166px, calc(env(safe-area-inset-bottom) + 166px)) !important;
+  }
+}
+
+
+/* V41.10 — top-right drive mode stack.
+   Exit Drive takes the old Bot slot; Bot and PVP stack directly below it.
+   The completed bottom control and air-roll layout is intentionally untouched. */
+body.drive-fullscreen .stage-buttons {
+  top: max(10px, env(safe-area-inset-top));
+  right: max(10px, env(safe-area-inset-right));
+  bottom: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 7px;
+  width: 102px;
+  z-index: 30;
+}
+
+body.drive-fullscreen .stage-buttons .stage-button {
+  width: 102px;
+  min-width: 102px;
+  min-height: 48px;
+  padding: 0 8px;
+  justify-content: center;
+}
+
+body.drive-fullscreen #playButton,
+body.drive-fullscreen #optimumButton,
+body.drive-fullscreen #viewModeButton,
+body.drive-fullscreen #cameraModeButton {
+  display: none !important;
+}
+
+body.drive-fullscreen #driveButton { grid-row: 1; }
+body.drive-fullscreen #botDifficultyButton { grid-row: 2; }
+body.drive-fullscreen #pvpButton { grid-row: 3; }
+
+.pvp-placeholder {
+  background: rgba(2, 19, 34, .82);
+  border-color: rgba(119, 207, 255, .5);
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  body.drive-fullscreen .stage-buttons {
+    top: max(8px, env(safe-area-inset-top));
+    right: max(8px, env(safe-area-inset-right));
+    gap: 5px;
+    width: 96px;
+  }
+  body.drive-fullscreen .stage-buttons .stage-button {
+    width: 96px;
+    min-width: 96px;
+    min-height: 42px;
+    font-size: .62rem;
+  }
+}
+
+
+/* v42.1 realtime PVP + automatic controller-clean UI */
+.pvp-status { position:absolute; z-index:35; left:50%; top:18%; transform:translate(-50%,-50%); min-width:180px; padding:14px 22px; border-radius:18px; border:1px solid rgba(125,211,255,.55); background:rgba(2,14,25,.86); color:#eaf8ff; box-shadow:0 12px 44px rgba(0,0,0,.46); text-align:center; font-weight:900; font-size:clamp(.85rem,3.8vw,1.45rem); letter-spacing:.08em; pointer-events:none; }
+.pvp-status[data-tone="countdown"] { font-size:clamp(2.8rem,14vw,7rem); color:#fff; background:rgba(2,14,25,.48); border-color:transparent; text-shadow:0 5px 25px rgba(0,0,0,.9); }
+.pvp-status[data-tone="go"] { color:#8bffbf; border-color:rgba(93,255,167,.7); }
+.pvp-status[data-tone="error"] { color:#ff9c9c; border-color:rgba(255,99,99,.7); }
+#pvpButton.active { background:linear-gradient(180deg,rgba(41,159,215,.98),rgba(15,87,137,.98)); border-color:rgba(143,224,255,.86); box-shadow:0 0 18px rgba(54,185,255,.34); }
+body.controller-ui-hidden .drive-overlay .joy-zone,
+body.controller-ui-hidden .drive-overlay .drive-controls-system,
+body.controller-ui-hidden .drive-overlay .viewport-air-roll-rail { opacity:0 !important; visibility:hidden !important; pointer-events:none !important; transition:opacity .16s ease; }
+body.controller-ui-hidden .drive-overlay .drive-ready { opacity:.38; }

@@ -30,7 +30,21 @@
 
     <section id="stageWrap" class="stage-wrap" aria-label="Three-dimensional bounce view">
       <canvas id="scene"></canvas>
+      <div id="supersonicVignette" class="supersonic-vignette" aria-hidden="true"></div>
+      <div id="scoreboard" class="scoreboard" aria-label="Scoreboard">
+        <div class="score-team blue-team"><span>BLUE</span><b id="blueScore">0</b></div>
+        <div class="score-divider">–</div>
+        <div class="score-team orange-team"><b id="orangeScore">0</b><span>ORANGE</span></div>
+      </div>
       <div id="phaseBadge" class="phase-badge">INCOMING PATH — WATCH THE LOOP</div>
+      <div id="pvpStatus" class="pvp-status" hidden aria-live="polite"></div>
+      <div id="goalCelebration" class="goal-celebration" hidden aria-live="assertive" aria-atomic="true">
+        <div class="goal-flash"></div>
+        <div class="goal-ring ring-one"></div>
+        <div class="goal-ring ring-two"></div>
+        <div class="goal-burst"></div>
+        <strong id="goalCelebrationText">GOAL!</strong>
+      </div>
       <div id="speedGauge" class="speed-gauge" aria-label="Ball speed">
         <div class="gauge-arc"><span id="gaugeNeedle"></span></div>
         <b id="speedText">0</b><small>uu/s</small>
@@ -38,6 +52,8 @@
       <div class="stage-buttons" aria-label="Arena controls">
         <button id="playButton" class="stage-button primary-stage" type="button">Pause</button>
         <button id="driveButton" class="stage-button" type="button">Drive</button>
+        <button id="botDifficultyButton" class="stage-button bot-difficulty" type="button" aria-label="Change bot difficulty">BOT: OFF</button>
+        <button id="pvpButton" class="stage-button pvp-placeholder" type="button" aria-label="Join or host the PVP lobby">PVP</button>
         <button id="optimumButton" class="stage-button" type="button" aria-pressed="false">Optimum</button>
         <button id="viewModeButton" class="stage-button" type="button">Car</button>
         <button id="cameraModeButton" class="stage-button" type="button" hidden>Camera</button>
@@ -45,18 +61,32 @@
       <div id="stageHelp" class="stage-help">Arena view: one finger orbits · two fingers zoom</div>
       <div id="pathHint" class="path-hint neutral">PATH CHECK — set your ball and car guess</div>
       <div id="driveOverlay" class="drive-overlay" hidden aria-label="Drive controls">
-        <div id="driveReady" class="drive-ready">Touch any control to start the ball</div>
-        <div id="joyZone" class="joy-zone">
+        <div id="driveReady" class="drive-ready">Touch any open space to place the stick</div>
+        <div id="joyZone" class="joy-zone" aria-label="Floating steering thumbstick">
           <div id="joyBase" class="joy-base">
             <div id="joyKnob" class="joy-knob"></div>
           </div>
         </div>
-        <button id="driveCameraButton" class="drive-camera-toggle" type="button" aria-pressed="true">Ball Cam</button>
-        <div class="drive-buttons" aria-label="Drive actions">
-          <button id="accelerateButton" class="drive-action accel" type="button">Accel</button>
-          <button id="boostButton" class="drive-action boost" type="button">Boost</button>
-          <button id="powerslideButton" class="drive-action powerslide" type="button">Powerslide</button>
-          <button id="jumpButton" class="drive-action jump" type="button">Jump</button>
+
+        <div class="air-roll-rail viewport-air-roll-rail" aria-label="Air roll controls">
+          <button id="airRollLeftButton" class="drive-action air-roll air-roll-left" type="button" aria-label="Air roll left">AR-L</button>
+          <button id="airRollRightButton" class="drive-action air-roll air-roll-right" type="button" aria-label="Air roll right">AR-R</button>
+        </div>
+
+        <div class="drive-controls-system" aria-label="Drive controls">
+          <div class="drive-control-cluster" aria-label="Primary drive actions">
+            <div id="accelBranches" class="accel-branches" aria-hidden="true">
+              <span class="accel-branch branch-left">A+PS</span>
+              <span class="accel-branch branch-center">A+B+PS</span>
+              <span class="accel-branch branch-right">A+BST</span>
+            </div>
+            <button id="driveCameraButton" class="drive-action camera compact-control" type="button" aria-pressed="true" aria-label="Toggle Ball Cam and Free Cam">BCAM</button>
+            <button id="powerslideButton" class="drive-action powerslide compact-control" type="button" aria-label="Powerslide">PS</button>
+            <button id="accelerateButton" class="drive-action accel primary-accelerate" type="button" aria-label="Accelerate and open combo branches">ACCEL</button>
+            <button id="boostButton" class="drive-action boost compact-control" type="button" aria-label="Boost">BST</button>
+            <button id="jumpButton" class="drive-action jump jump-below-accel" type="button" aria-label="Jump and dodge">JMP</button>
+            <button id="reverseButton" class="drive-action reverse compact-control" type="button" aria-label="Reverse and brake">REV</button>
+          </div>
         </div>
       </div>
     </section>
@@ -203,6 +233,7 @@
     <p>The car route is an approximate ballistic aerial: horizontal heading, vertical launch angle, initial speed, launch delay, and gravity. After locking your read, adjust the delay to test whether your car and the live ball actually overlap in time and space. It does not yet model boost acceleration or mid-air steering. After locking your read, you can keep adjusting the ball angle, car angle, speed, and delay to test near misses and timing.</p>
   </dialog>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>
